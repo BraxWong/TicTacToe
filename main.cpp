@@ -6,16 +6,26 @@ using namespace std;
 //Class for player 1, mainly to store the symbol as private to prevent tempering, and a public method to return the symbol. Same for player 2's class
 class Player1 {
     public:
+        //Initialize statement so the compiler will not complain
+        Player1() {score = 0; symbol = "O";}
         string returnSymbol() {return symbol;}
+        void increment() {score+=1;}
+        void returnScore() {cout << "player1:" << score << endl;}
     private:
-        string symbol = "O";
+        int score;
+        string symbol;
 };
 
 class Player2 {
     public:
+        //Initialize statement so the compiler will not complain
+        Player2() {score = 0, symbol = "X";}
         string returnSymbol() {return symbol;}
+        void increment() {score+=1;}
+        void returnScore() {cout << "player2:" << score << endl;}
     private:
-        string symbol = "X";
+        int score;
+        string symbol;
 };
 
 //To maintain the state of the field
@@ -32,7 +42,7 @@ class Field {
         //Prints the field
         void printField();
         //Starts the game
-        void startGame();
+        void startGame(Player1 *player1, Player2 *player2);
         //Check whether the game is done
         bool gameEnd(string symbol);
         //Check if the field is full but winning conditions are not met
@@ -118,9 +128,9 @@ bool Field::gameEnd(string symbol) {
     //It is not over just yet
     return false;
 }
-void Field::startGame() {
+void Field::startGame(Player1 *player1, Player2 *player2) {
     //Creates 2 objects, player 1 and 2
-    Player1 player1; Player2 player2;
+
     //to store user inputs and pass in to the methods later on
     int row, column;
     printField();
@@ -134,15 +144,22 @@ void Field::startGame() {
             //User input stores in variable column
             cin >> column;
             //Setting it
-            if(set(row,column,player1.returnSymbol())){
+            if(set(row,column,player1->returnSymbol())){
                 break;
             };
         }
         //Print out the playing field
         printField();
         //If gameEnd returns true, that means player 1 wins
-        if(gameEnd(player1.returnSymbol())){
+        if(gameEnd(player1->returnSymbol())){
             cout << "Player 1 wins!!!\n";
+            //Increase player 1's score
+            player1->increment();
+            cout << "Score:\n";
+            //Printing out the scores
+            player1->returnScore();
+            player2->returnScore();
+            cout << "\n";
             break;
         }
         while(true){
@@ -154,15 +171,22 @@ void Field::startGame() {
             //User input stores in variable column
             cin >> column;
             //Setting it
-            if(set(row,column,player2.returnSymbol())) {
+            if(set(row,column,player2->returnSymbol())) {
                 break;
             }
         }
         //Print out the playing field
         printField();
         //If gameEnd returns true, that means player 1 wins
-        if(gameEnd(player2.returnSymbol())){
+        if(gameEnd(player2->returnSymbol())){
             cout << "Player 2 wins!!!\n";
+            //Increase player 2's score
+            player2->increment();
+            cout << "Score:\n";
+            //Printing out the scores
+            player1->returnScore();
+            player2->returnScore();
+            cout << "\n";
             break;
         }
     }
@@ -182,14 +206,16 @@ void Field::printField() {
 
 
 int main() {
-    cout << "Tic Tac Toe. Created By Brax. Version 1.0.0\n";
+    cout << "Tic Tac Toe. Created By Brax. Version 1.0.1\n";
+    Player1 player1 = Player1(); Player2 player2 = Player2(); 
+    
     while(true){
         //Creating the field object
         Field playMat;
         //to store whether the user wants to play again or not
         string tryAgain;
-        //Starting the game
-        playMat.startGame();
+        //Starting the game, have to pass by reference instead since the score will be reset to 0 every time.
+        playMat.startGame(&player1,&player2);
         //Clear out previous user inputs
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
